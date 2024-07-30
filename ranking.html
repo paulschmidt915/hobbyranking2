@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Freizeitaktivitäten Ranking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+      .relative {
+        position: relative;
+      }
+      .absolute {
+        position: absolute;
+      }
+    </style>
+</head>
+<body style="padding: 50px;">
+  <div class="container mx-auto max-w-6xl">
+    <div id="root"></div>
+  </div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const ActivityBox = ({ activity, deleteActivity, moveUp, moveDown, isFirst, isLast }) => (
+      <div id={activity.id} className="relative m-2 p-4 border-2 rounded-md">
+        <button
+          onClick={() => deleteActivity(activity.id)}
+          className="absolute top-0 right-0 m-2 text-gray-500 hover:text-gray-700"
+        >
+          <i className="fas fa-trash"></i>
+        </button>
+        <p className="font-bold text-lg mb-2">{activity.title}</p>
+        <div className="flex space-x-2">
+          <button
+            onClick={moveUp}
+            className={`text-blue-500 hover:text-blue-700 ${isFirst ? 'invisible' : ''}`}
+          >
+            <i className="fas fa-arrow-up"></i>
+          </button>
+          <button
+            onClick={moveDown}
+            className={`text-yellow-500 hover:text-yellow-700 ${isLast ? 'invisible' : ''}`}
+          >
+            <i className="fas fa-arrow-down"></i>
+          </button>
+        </div>
+      </div>
+    );
+
+    const ActivityList = ({ activities, deleteActivity, moveUp, moveDown }) => {
+      return (
+        <div>
+          {activities.map((activity, index) => (
+            <ActivityBox
+              key={activity.id}
+              activity={activity}
+              deleteActivity={deleteActivity}
+              moveUp={() => moveUp(index)}
+              moveDown={() => moveDown(index)}
+              isFirst={index === 0}
+              isLast={index === activities.length - 1}
+            />
+          ))}
+        </div>
+      );
+    };
+
+    const NewActivityForm = ({ addActivity }) => {
+      const [title, setTitle] = useState('');
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const newActivity = {
+          id: Date.now().toString(),
+          title,
+        };
+        addActivity(newActivity);
+        setTitle('');
+      };
+
+      return (
+        <form onSubmit={handleSubmit} className="mb-4 w-full max-w-xl">
+          <h2 className="text-xl font-bold mb-2">Neue Freizeitaktivität hinzufügen</h2>
+          <div className="mb-2">
+            <label htmlFor="title" className="block font-bold mb-1">Aktivität:</label>
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-2 py-1 border border-gray-300 rounded"
+              required
+            />
+          </div>
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Hinzufügen</button>
+        </form>
+      );
+    };
+
+    const ActivityRanking = () => {
+      const [activities, setActivities] = useState([
+        { id: '1', title: 'Basteln' },
+        { id: '2', title: 'Sport' },
+        { id: '3', title: 'Musik machen' },
+        { id: '4', title: 'Lesen' },
+        { id: '5', title: 'Musik hören' },
+        { id: '6', title: 'Videos anschauen' },
+        { id: '7', title: 'Fernsehen schauen' },
+        { id: '8', title: 'Zocken' },
+        { id: '9', title: 'Freunde treffen' },
+        { id: '10', title: 'Fahrrad fahren' },
+        { id: '11', title: 'Malen' },
+        { id: '12', title: 'Brettspiele spielen' },
+        { id: '13', title: 'Schwimmen' },
+        { id: '14', title: 'Gärtnern' },
+        { id: '15', title: 'Tiere pflegen' },
+      ]);
+
+      const addActivity = (newActivity) => {
+        setActivities([...activities, newActivity]);
+      };
+
+      const deleteActivity = (id) => {
+        setActivities(activities.filter(activity => activity.id !== id));
+      };
+
+      const moveUp = (index) => {
+        if (index > 0) {
+          const newActivities = [...activities];
+          [newActivities[index - 1], newActivities[index]] = [newActivities[index], newActivities[index - 1]];
+          setActivities(newActivities);
+        }
+      };
+
+      const moveDown = (index) => {
+        if (index < activities.length - 1) {
+          const newActivities = [...activities];
+          [newActivities[index], newActivities[index + 1]] = [newActivities[index + 1], newActivities[index]];
+          setActivities(newActivities);
+        }
+      };
+
+      return (
+        <div>
+          <div className="flex mb-4">
+            <div>
+                <p className="text-2xl font-bold mb-4">Wie gerne macht ihr diese Hobbies?</p>
+                <p className="mb-4">Liebe Schülerinnen und Schüler,</p>
+              <p className="mb-4">
+                Willkommen zur ersten Aufgabe eures Workshops! 
+                Eure Gruppe soll die verschiedenen Freizeitaktivitäten danach ordnen, wie gerne ihr diese Aktivitäten macht. 
+                Bitte nutzt die Pfeile neben jeder Aktivität, um sie in die richtige Reihenfolge zu bringen. 
+                Ihr könnt auch neue Aktivitäten hinzufügen, wenn euch welche einfallen, die noch nicht auf der Liste stehen.
+              </p>
+              <p className="mb-4">Viel Spaß und viel Erfolg!</p>
+            </div>
+            <img src="https://img.freepik.com/free-vector/hand-drawn-flat-people-hobbies_52683-70931.jpg?t=st=1722332322~exp=1722335922~hmac=0a5e9ff347114c4419435b223ed9d58ea4c09db494ef87a1776d53b978714694&w=1060" alt="Hobbies" className="w-1/3 mr-4" />
+          </div>
+          <ActivityList
+            activities={activities}
+            deleteActivity={deleteActivity}
+            moveUp={moveUp}
+            moveDown={moveDown}
+          />
+          <NewActivityForm addActivity={addActivity} />
+        </div>
+      );
+    };
+
+    ReactDOM.render(<ActivityRanking />, document.getElementById('root'));
+  </script>
+</body>
+</html>
